@@ -52,7 +52,7 @@ class Kueue(pulumi.ComponentResource):
 
         kueue_release = kubernetes.yaml.v2.ConfigFile(
             "kueue",
-            file=f"https://github.com/kubernetes-sigs/kueue/releases/download/{version}/manifests.yaml",
+            file=pulumi.Output.format("https://github.com/kubernetes-sigs/kueue/releases/download/{}/manifests.yaml", version),
             opts=pulumi.ResourceOptions(
                 parent=self,
                 provider=opts.provider
@@ -61,7 +61,7 @@ class Kueue(pulumi.ComponentResource):
 
         kueue_controller_deployment = kubernetes.apps.v1.Deployment.get(
             "kueue-controller-deployment",
-            f"{namespace}/kueue-controller-manager",
+            pulumi.Output.format("{}/kueue-controller-manager", namespace),
             opts=pulumi.ResourceOptions(
                 parent=self,
                 provider=opts.provider,
@@ -71,16 +71,16 @@ class Kueue(pulumi.ComponentResource):
 
         # Create ResourceFlavor for the selected GPU type
         resource_flavor = kubernetes.apiextensions.CustomResource(
-            f"{gpu_flavor}-gpu-flavor",
+            pulumi.Output.format("{}-gpu-flavor", gpu_flavor),
             api_version="kueue.x-k8s.io/v1beta1",
             kind="ResourceFlavor",
             metadata=kubernetes.meta.v1.ObjectMetaArgs(
-                name=f"{gpu_flavor}-gpu"
+                name=pulumi.Output.format("{}-gpu", gpu_flavor)
             ),
             spec={
                 "nodeLabels": {
                     "purpose": "training",
-                    "gpu-type": f"{gpu_flavor}"
+                    "gpu-type": gpu_flavor
                 },
                 "tolerations": [
                     {
@@ -101,11 +101,11 @@ class Kueue(pulumi.ComponentResource):
 
         # Create ClusterQueue for training workloads
         training_cluster_queue = kubernetes.apiextensions.CustomResource(
-            f"training-{gpu_flavor}-cq",
+            pulumi.Output.format("training-{}-cq", gpu_flavor),
             api_version="kueue.x-k8s.io/v1beta1",
             kind="ClusterQueue",
             metadata=kubernetes.meta.v1.ObjectMetaArgs(
-                name=f"training-{gpu_flavor}"
+                name=pulumi.Output.format("training-{}", gpu_flavor)
             ),
             spec={
                 "namespaceSelector": {},
@@ -114,7 +114,7 @@ class Kueue(pulumi.ComponentResource):
                         "coveredResources": ["nvidia.com/gpu"],
                         "flavors": [
                             {
-                                "name": f"{gpu_flavor}-gpu",
+                                "name": pulumi.Output.format("{}-gpu", gpu_flavor),
                                 "resources": [
                                     {
                                         "name": "nvidia.com/gpu",
@@ -145,7 +145,7 @@ class Kueue(pulumi.ComponentResource):
                 namespace="train"
             ),
             spec={
-                "clusterQueue": f"training-{gpu_flavor}"
+                "clusterQueue": pulumi.Output.format("training-{}", gpu_flavor)
             },
             opts=pulumi.ResourceOptions(
                 parent=self,
