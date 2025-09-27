@@ -16,7 +16,7 @@ class KueueArgs(TypedDict):
     """The total number of available GPUs"""
 
 
-class KueueStack(pulumi.ComponentResource):
+class Kueue(pulumi.ComponentResource):
     """
     This class sets up and configures a Kubernetes-based workload management system
     using Pulumi and the Kueue project. It assists in automating the creation of Kubernetes

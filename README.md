@@ -43,18 +43,18 @@ pip install pulumi>=3.0.0,<4.0.0 pulumi-kubernetes>=4.0.0,<5.0.0
 ### Usage
 
 ```python
-from kueue import KueueStack
+from kueue import Kueue
 
 # Basic usage with default A100 GPUs
-kueue = KueueStack("my-kueue", {
+kueue = Kueue("my-kueue", {
     "total_gpus": 8  # Required: specify total available GPUs
 })
 
 # Custom configuration
-kueue = KueueStack("my-kueue", {
-    "version": "v0.13.4",      # Optional: Kueue version (default: v0.13.4)
-    "gpu_flavor": "v100",      # Optional: GPU type (default: a100)
-    "total_gpus": 16           # Required: total available GPUs
+kueue = Kueue("my-kueue", {
+    "version": "v0.13.4",  # Optional: Kueue version (default: v0.13.4)
+    "gpu_flavor": "v100",  # Optional: GPU type (default: a100)
+    "total_gpus": 16  # Required: total available GPUs
 })
 ```
 
@@ -109,7 +109,7 @@ Features:
 ```python
 import pulumi
 import pulumi_kubernetes as k8s
-from kueue import KueueStack
+from kueue import Kueue
 
 # Create namespace for training workloads
 train_namespace = k8s.core.v1.Namespace(
@@ -118,9 +118,9 @@ train_namespace = k8s.core.v1.Namespace(
 )
 
 # Deploy Kueue with 8 A100 GPUs
-kueue = KueueStack("kueue-system", {
+kueue = Kueue("kueue-system", {
     "version": "v0.13.4",
-    "gpu_flavor": "a100", 
+    "gpu_flavor": "a100",
     "total_gpus": 8
 })
 
