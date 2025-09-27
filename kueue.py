@@ -71,7 +71,7 @@ class Kueue(pulumi.ComponentResource):
 
         # Create ResourceFlavor for the selected GPU type
         resource_flavor = kubernetes.apiextensions.CustomResource(
-            pulumi.Output.format("{}-gpu-flavor", gpu_flavor),
+            "gpu-flavor",
             api_version="kueue.x-k8s.io/v1beta1",
             kind="ResourceFlavor",
             metadata=kubernetes.meta.v1.ObjectMetaArgs(
@@ -101,7 +101,7 @@ class Kueue(pulumi.ComponentResource):
 
         # Create ClusterQueue for training workloads
         training_cluster_queue = kubernetes.apiextensions.CustomResource(
-            pulumi.Output.format("training-{}-cq", gpu_flavor),
+            "training-cq",
             api_version="kueue.x-k8s.io/v1beta1",
             kind="ClusterQueue",
             metadata=kubernetes.meta.v1.ObjectMetaArgs(
