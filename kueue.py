@@ -36,8 +36,8 @@ class Kueue(pulumi.ComponentResource):
         super().__init__('kueue-component:index:Kueue', name, {}, opts)
 
         namespace = "kueue-system"
-        gpu_flavor = args.get("gpu_flavor", "a100")
-        version = args.get("version", "v0.13.4")
+        gpu_flavor = pulumi.Output.from_input(args.get("gpu_flavor") or "a100")
+        version = pulumi.Output.from_input(args.get("version") or "v0.13.4")
 
         train_namespace = kubernetes.core.v1.Namespace(
             "train",
