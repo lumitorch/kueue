@@ -95,19 +95,34 @@ class Kueue(pulumi.ComponentResource):
                 provider=opts.provider
             )
         )
-
-        kueue_release = kubernetes.yaml.v2.ConfigFile(
-            "kueue",
-            file=pulumi.Output.format("https://github.com/kubernetes-sigs/kueue/releases/download/{}/manifests.yaml", version),
+        
+        kueue_namespace = kubernetes.core.v1.Namespace(
+            namespace,
+            metadata=kubernetes.meta.v1.ObjectMetaArgs(
+                name=namespace
+            ),
             opts=pulumi.ResourceOptions(
                 parent=self,
                 provider=opts.provider
-            ),
+            )
+        )
+        
+        kueue_release = kubernetes.helm.v3.Release(
+            "kueue",
+            name="kueue",
+            chart="oci://registry.k8s.io/kueue/charts/kueue",
+            version=version.apply(lambda v: v.removeprefix("v")),
+            namespace=kueue_namespace.metadata.name,
+            opts=pulumi.ResourceOptions(
+                parent=self,
+                provider=opts.provider
+            )
         )
 
         kueue_controller_deployment = kubernetes.apps.v1.Deployment.get(
             "kueue-controller-deployment",
-            pulumi.Output.format("{}/kueue-controller-manager", namespace),
+            # Pass the id through the release status to ensure this only runs after the release is ready
+            kueue_release.status.apply(lambda _: f"{namespace}/kueue-controller-manager"),
             opts=pulumi.ResourceOptions(
                 parent=self,
                 provider=opts.provider,
