@@ -81,7 +81,7 @@ class Kueue(pulumi.ComponentResource):
         super().__init__('kueue-component:index:Kueue', name, {}, opts)
 
         namespace = "kueue-system"
-        gpu_flavor = with_default(args.get("gpu_flavor"), "a100")
+        gpu_flavor = with_default(args.get("gpu_flavor").lower(), "a100")
         version = with_default(args.get("version"), "v0.13.4")
         total_gpus = as_int(args.get("total_gpus"), default=None, name="total_gpus", min_=1)
 
@@ -95,7 +95,7 @@ class Kueue(pulumi.ComponentResource):
                 provider=opts.provider
             )
         )
-        
+
         kueue_namespace = kubernetes.core.v1.Namespace(
             namespace,
             metadata=kubernetes.meta.v1.ObjectMetaArgs(
@@ -106,7 +106,7 @@ class Kueue(pulumi.ComponentResource):
                 provider=opts.provider
             )
         )
-        
+
         kueue_release = kubernetes.helm.v3.Release(
             "kueue",
             name="kueue",
