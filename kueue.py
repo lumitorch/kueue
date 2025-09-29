@@ -218,6 +218,7 @@ class Kueue(pulumi.ComponentResource):
 
         self.register_outputs({
             "train_namespace": train_namespace,
+            "kueue_namespace": kueue_namespace,
             "kueue_release": kueue_release,
             "kueue_controller": kueue_controller_deployment,
             "resource_flavor": resource_flavor,
