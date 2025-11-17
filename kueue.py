@@ -10,7 +10,7 @@ T = TypeVar("T")
 # Normalize Input[T] to Output[T] and apply a default when the value is None
 # Avoids using Python's `or`, which would clobber valid falsy values like 0 or "".
 def with_default(value: Optional[pulumi.Input[T]], default: T) -> pulumi.Output[T]:
-    return pulumi.Output.from_input(value).apply(lambda v: default if v is None else v)
+    return pulumi.Output.from_input(value).apply(lambda v: default if v.lower() is None else v)
 
 
 # ---- Input validators / coercers -------------------------------------------
@@ -81,7 +81,7 @@ class Kueue(pulumi.ComponentResource):
         super().__init__('kueue-component:index:Kueue', name, {}, opts)
 
         namespace = "kueue-system"
-        gpu_flavor = with_default(args.get("gpu_flavor").lower(), "a100")
+        gpu_flavor = with_default(args.get("gpu_flavor"), "a100")
         version = with_default(args.get("version"), "v0.13.4")
         total_gpus = as_int(args.get("total_gpus"), default=None, name="total_gpus", min_=1)
 
